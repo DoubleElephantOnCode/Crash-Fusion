@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 /**
  * 
  * @author WLJ
- *
+ *@version 0.1
  */
 public class MyGdxGame extends ApplicationAdapter {
 	SpriteBatch batch;
