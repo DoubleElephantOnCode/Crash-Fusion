@@ -25,9 +25,9 @@ public class Dye {
 		if(redcolor.num >= greencolor.num &&redcolor.num >= bluecolor.num){
 			return redcolor;
 		}else if(greencolor.num >= redcolor.num && greencolor.num >= bluecolor.num){
-			return bluecolor;
-		}else{
 			return greencolor;
+		}else{
+			return bluecolor;
 		}
 	}
 	
