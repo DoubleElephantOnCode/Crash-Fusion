@@ -14,8 +14,9 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 public class Map{
 	
 	static boolean drawLine = false;
-	int frontRow, frontColumn;
-	int realRow, realColumn;
+	int frontRow = -1, frontColumn = -1;
+	int realRow = -1, realColumn = -1;
+	int selectedRow = -1, selectedColumn = -1;
 	
 	int width, height;
 	String path;
@@ -23,6 +24,8 @@ public class Map{
 	int[] always;
 	int rowOfMap, columnOfMap;
 	int widthOfMap, heightOfMap;
+	
+	int max = 100;
 	
 	Color white = new Color(1, 1, 1, 1);
 	Color none = new Color(0, 0, 0, 0);
@@ -35,6 +38,7 @@ public class Map{
 	DyeImg[][] dyeImg;
 	Dye[][] dye;
 	SpriteBatch batch;
+	VirtualLine line;
 	
 	String alwaysSeen_1 = "background";
 	String alwaysSeen_2 = "off";// off-*-*
@@ -56,73 +60,111 @@ public class Map{
 		
 		this.initial();
 		this.initialDye();
+		
+		line = new VirtualLine();
 	}
 	
 	public void render(int downX, int downY, int nowX, int nowY, boolean isDown){
 		render.render(always);
 		renderDye();
-		if(!isDown){
-			if(downX == nowX && downY == nowY) return;
-			int[] p = collision.getPool(downX, downY);
-			int[] q = collision.getPool(nowX, nowY);
-			if(p == null || q == null){
-				drawLine = false;
-				return;
+		
+		int[] p = collision.getPool(downX, downY);
+		int[] q = collision.getPool(nowX, nowY);
+		
+		if((p == null || q == null) && isDown) return;//相关操作太多，1.在拖拽bar，2.要点击空白消除选择
+		if(p == null || q == null) return;
+		if(p[0] == q[0] && p[1] == q[1]){
+			if(isDown){//如果为按住状态，标明可以移动的位置
+				selectedRow = p[0];
+				selectedColumn = p[1];
+				frontRow = -1;
+				frontColumn = -1;
+				realRow = -1;
+				realColumn = -1;
+				for(int i = 0; i < numOfPoolRow; i++){
+					for(int j = 0; j < numOfPoolColumn; j++){
+						if(Math.abs(p[0] - i) <= 1 && Math.abs(p[1] - j) <= 1){
+							int[] index = new int[1];
+							index[0] = this.findLayerIndex(choiceSeen + split + i + split + j);
+							render.render(index);
+						}
+					}
+				}
+				Condition.useBar = false;
 			}
-			if(p[0] == q[0] && p[1] == q[1]){
+			else{//否则只是选中
 				int[] index = new int[1];
-				index[0] = this.findLayerIndex(choiceSeen + split + p[0] + split + p[1]);
-				render.render(index);
-				drawLine = false;
-			}
-			else if(Math.abs(p[0] - q[0]) <= 1 && Math.abs(p[1] - q[1]) <= 1){
-				int[] index = new int[1];
-				index[0] = this.findLayerIndex(choiceSeen + split + p[0] + split + p[1]);
-				render.render(index);
-				index[0] = this.findLayerIndex(choiceSeen + split + q[0] + split + q[1]);
-				render.render(index);
-				drawLine = true;
-			}
-			else{
-				int[] index = new int[1];
-				index[0] = this.findLayerIndex(choiceSeen + split + p[0] + split + p[1]);
-				render.render(index);
-				drawLine = false;
+				index[0] = this.findLayerIndex(choiceSeen + split + selectedRow + split + selectedColumn);
+				if(index[0] >= 0){
+					render.render(index);
+					Condition.condition = 1;
+					Condition.useBar = false;
+				}
 			}
 		}
 		else{
-			int[] p = collision.getPool(downX, downY);
-			int[] q = collision.getPool(nowX, nowY);
-			if(p == null || q == null){
-				drawLine = false;
-				return;
-			}
-			frontRow = p[0];
-			frontColumn = p[1];
-			realRow = q[0];
-			realColumn = q[1];
-			for(int i = 0; i < numOfPoolRow; i++){
-				for(int j = 0; j < numOfPoolColumn; j++){
-					if(Math.abs(p[0] - i) <= 1 && Math.abs(p[1] - j) <= 1){
-						int[] index = new int[1];
-						index[0] = this.findLayerIndex(choiceSeen + split + i + split + j);
+			if(isDown){//如果为按住状态，则正在选择转移的位置，引导线要出现
+				if(Math.abs(p[0] - q[0]) <= 1 && Math.abs(p[1] - q[1]) <= 1){//有效移动
+					frontRow = p[0];
+					frontColumn = p[1];
+					realRow = q[0];
+					realColumn = q[1];
+					selectedRow = -1;
+					selectedColumn = -1;
+					for(int i = 0; i < numOfPoolRow; i++){//先显示所有可以移动到的位置
+						for(int j = 0; j < numOfPoolColumn; j++){
+							if(Math.abs(p[0] - i) <= 1 && Math.abs(p[1] - j) <= 1){
+								int[] index = new int[1];
+								index[0] = this.findLayerIndex(choiceSeen + split + i + split + j);
+								render.render(index);
+							}
+						}
+					}
+					//再着重被选中移动到的位置
+					int[] index = new int[1];
+					index[0] = this.findLayerIndex(choiceSeen + split + realRow + split + realColumn);
+					if(index[0] >= 0){
 						render.render(index);
+						render.render(index);
+						line.render(downX, downY, nowX, nowY, true);
+						Condition.condition = 2;
+						Condition.useBar = true;
 					}
 				}
+				else{//无效移动
+					this.initialSelected();
+					for(int i = 0; i < numOfPoolRow; i++){//先显示所有可以移动到的位置
+						for(int j = 0; j < numOfPoolColumn; j++){
+							if(Math.abs(p[0] - i) <= 1 && Math.abs(p[1] - j) <= 1){
+								int[] index = new int[1];
+								index[0] = this.findLayerIndex(choiceSeen + split + i + split + j);
+								render.render(index);
+							}
+						}
+					}
+					line.render(downX, downY, nowX, nowY, true);
+					Condition.useBar = false;
+				}
 			}
-			if(Math.abs(p[0] - q[0]) <= 1 && Math.abs(p[1] - q[1]) <= 1){
-				int[] index = new int[1];
-				index[0] = this.findLayerIndex(choiceSeen + split + q[0] + split + q[1]);
-				render.render(index);
-				render.render(index);
+			else{//否则为等待下一步操作状态，显示起始和终点，引导线要出现,保持之前选定的引导状态
+				int[] index = new int[2];
+				index[0] = this.findLayerIndex(choiceSeen + split + realRow + split + realColumn);
+				index[1] = this.findLayerIndex(choiceSeen + split + frontRow + split + frontColumn);
+				if(index[0] >= 0 && index[1] >= 0){
+					render.render(index);
+					line.render();
+					Condition.condition = 2;
+					Condition.useBar = true;
+				}
 			}
-			drawLine = true;
 		}
+		//下面注释为原有代码，以上为更新后
 	}
 	
 	public void renderDye(){
 		for(int i = 0; i < numOfPoolRow; i++){
 			for(int j = 0; j < numOfPoolColumn; j++){
+				if(DragBar.isDraged && ((i == frontRow && j == frontColumn) || (i == realRow && j == realColumn))) continue;
 				Color color = MixColor.mixRGB(dye[i][j].red, dye[i][j].green, dye[i][j].blue);
 				setColor(i, j, color);
 			}
@@ -214,6 +256,7 @@ public class Map{
 		for(int i = 0; i < numOfPoolRow; i++){
 			for(int j = 0; j < numOfPoolColumn; j++){
 				dye[i][j] = new Dye(0, 0, 0);
+				dye[i][j].whose = 0;
 			}
 		}
 	}
@@ -230,5 +273,73 @@ public class Map{
 		}
 		return -1;
 	}
+	
+	private void initialSelected(){
+		frontRow = -1;
+		frontColumn = -1;
+		realRow = -1;
+		realColumn = -1;
+		selectedRow = -1;
+		selectedColumn = -1;
+	}
 
 }
+
+
+//if(!isDown){
+//if(downX == nowX && downY == nowY) return;
+//int[] p = collision.getPool(downX, downY);
+//int[] q = collision.getPool(nowX, nowY);
+//if(p == null || q == null){
+//	drawLine = false;
+//	return;
+//}
+//if(p[0] == q[0] && p[1] == q[1]){
+//	int[] index = new int[1];
+//	index[0] = this.findLayerIndex(choiceSeen + split + p[0] + split + p[1]);
+//	render.render(index);
+//	drawLine = false;
+//}
+//else if(Math.abs(p[0] - q[0]) <= 1 && Math.abs(p[1] - q[1]) <= 1){
+//	int[] index = new int[1];
+//	index[0] = this.findLayerIndex(choiceSeen + split + p[0] + split + p[1]);
+//	render.render(index);
+//	index[0] = this.findLayerIndex(choiceSeen + split + q[0] + split + q[1]);
+//	render.render(index);
+//	drawLine = true;
+//}
+//else{
+//	int[] index = new int[1];
+//	index[0] = this.findLayerIndex(choiceSeen + split + p[0] + split + p[1]);
+//	render.render(index);
+//	drawLine = false;
+//}
+//}
+//else{
+//int[] p = collision.getPool(downX, downY);
+//int[] q = collision.getPool(nowX, nowY);
+//if(p == null || q == null){
+//	drawLine = false;
+//	return;
+//}
+//frontRow = p[0];
+//frontColumn = p[1];
+//realRow = q[0];
+//realColumn = q[1];
+//for(int i = 0; i < numOfPoolRow; i++){
+//	for(int j = 0; j < numOfPoolColumn; j++){
+//		if(Math.abs(p[0] - i) <= 1 && Math.abs(p[1] - j) <= 1){
+//			int[] index = new int[1];
+//			index[0] = this.findLayerIndex(choiceSeen + split + i + split + j);
+//			render.render(index);
+//		}
+//	}
+//}
+//if(Math.abs(p[0] - q[0]) <= 1 && Math.abs(p[1] - q[1]) <= 1){
+//	int[] index = new int[1];
+//	index[0] = this.findLayerIndex(choiceSeen + split + q[0] + split + q[1]);
+//	render.render(index);
+//	render.render(index);
+//}
+//drawLine = true;
+//}

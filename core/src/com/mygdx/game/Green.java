@@ -1,7 +1,5 @@
 package com.mygdx.game;
 
-import com.mygdx.game.Colour.Type;
-
 public class Green extends Colour{
 	public Green(int num){
 		super(Type.green ,num);

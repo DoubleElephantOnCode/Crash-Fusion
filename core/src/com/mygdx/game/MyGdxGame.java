@@ -13,10 +13,11 @@ import com.badlogic.gdx.graphics.GL20;
 public class MyGdxGame extends ApplicationAdapter {
 	InputMultiplexer multiplexer;
 	TouchPointer pointer;
-	VirtualLine line;
 	Map map;
 	DragBar bar;
+	Play play;
 	
+//	int width = 800, height = 480;
 	String mapPath = "map/map.tmx";
 	int numOfPoolRow = 4, numOfPoolColumn = 5;
 	int rowOfMap = 6, columnOfMap = 7;
@@ -36,8 +37,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		bar.setPosition(10, 10);
 		bar.setSize(400, 20);
 		
-		line = new VirtualLine();
-		Play p = new Play(map);
+		play = new Play(map, bar);
 	}
 
 	@Override
@@ -47,16 +47,8 @@ public class MyGdxGame extends ApplicationAdapter {
 		
 		map.render(pointer.getDownX(), pointer.getDownY(), pointer.getNowX(), pointer.getNowY(), pointer.DOWN);
 		
-		bar.render(pointer.getNowX(), pointer.getNowY(), pointer.DOWN);
+		bar.render(pointer.getNowX(), pointer.getNowY(), Condition.useBar, pointer.DOWN);
 		
-		if(bar.isDraged){
-			line.render();
-			bar.resetCondition();
-		}
-		else{
-			line.render(pointer.getDownX(), pointer.getDownY(), pointer.getNowX(), pointer.getNowY(), Map.drawLine);
-			bar.reset();
-		}
-		
+		play.mixFriend(bar.value, pointer.DOWN);
 	}
 }

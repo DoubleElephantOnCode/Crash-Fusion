@@ -18,7 +18,9 @@ public class DragBar extends Actor{
 	float x = 0, y = 0;
 	float bx = 0, by = 0;
 	float value = 0;
-	boolean isDraged = false;
+	float max_value = 1;
+	float min_value = 0;
+	static boolean isDraged = false;
 	public DragBar(String color){
 		Texture buttonImg = new Texture(Gdx.files.internal("dragBar/dragButton_"+color+".png"));
 		Texture barImg = new Texture(Gdx.files.internal("dragBar/bar.png"));
@@ -29,14 +31,22 @@ public class DragBar extends Actor{
 		batch = new SpriteBatch();
 	}
 	
-	public void render(float x, float y, boolean useable){
-		if(useable && (x - this.x) >= height / 2 && (x - this.x) <= width && (y - this.y) >= 0 && (y - this.y) <= height){
-			bx = x - height / 2;
+	public void render(float x, float y, boolean useable, boolean isDown){
+		if(isDown && useable && (x - this.x) >= -height / 2 && (x - this.x) <= width + height / 2 && (y - this.y) >= -height / 2 && (y - this.y) <= height * 3 / 2){
+			bx = x;
 			if(bx < this.x) bx = this.x;
+			if(bx > this.x + width) bx = this.x + width;
 			value = (bx - this.x) / width;
+			if(value > max_value){
+				value = max_value;
+				bx = this.x + value * width;
+			}
+			else if(value < min_value){
+				value = min_value;
+				bx = this.x + value * width;
+			}
 			spritebutton.setPosition(bx, by);
 			isDraged = true;
-			Play.move(value);
 		}
 		batch.begin();
 		spritebar.draw(batch);
@@ -46,11 +56,33 @@ public class DragBar extends Actor{
 		batch.end();
 	}
 	
+	public void setValue(float v){
+		value = v;
+		if(value > 1) value = 1;
+		if(value < 0) value = 0;
+		bx = x + width * v;
+		spritebutton.setPosition(bx, by);
+		batch.begin();
+		spritebar.draw(batch);
+		batch.end();
+		batch.begin();
+		spritebutton.draw(batch);
+		batch.end();
+	}
+	
+	public void setMaxValue(float max){
+		max_value = max;
+	}
+	
+	public void setMinValue(float min){
+		min_value = min;
+	}
+	
 	public void setSize(int width, int height){
 		this.width = width;
 		this.height = height;
 		spritebutton.setSize(height, height);
-		spritebar.setSize(width - height / 2, height);
+		spritebar.setSize(width, height);
 		setPosition(x, y);
 	}
 	
@@ -60,7 +92,7 @@ public class DragBar extends Actor{
 		bx = x;
 		by = y;
 		spritebutton.setPosition(x, y);
-		spritebar.setPosition(x + height / 2, y);
+		spritebar.setPosition(x, y);
 	}
 	
 	public void resetCondition(){
@@ -71,6 +103,7 @@ public class DragBar extends Actor{
 		bx = x;
 		value = 0;
 		isDraged = false;
+		spritebutton.setPosition(bx, by);
 		batch.begin();
 		spritebar.draw(batch);
 		batch.end();

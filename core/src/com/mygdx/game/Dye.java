@@ -4,6 +4,10 @@ public class Dye {
 	int red;
 	int green;
 	int blue;
+	public int maxDye;//可以容下的最大  red +　green + blue 的量
+	
+	public int whose = 0;//0无归属，1，2分别为双方归属
+	
 	Red redcolor;
 	Green greencolor;
 	Blue bluecolor;
