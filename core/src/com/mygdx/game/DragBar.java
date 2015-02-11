@@ -47,6 +47,7 @@ public class DragBar extends Actor{
 			}
 			spritebutton.setPosition(bx, by);
 			isDraged = true;
+			Condition.condition = 3;
 		}
 		batch.begin();
 		spritebar.draw(batch);
@@ -71,10 +72,14 @@ public class DragBar extends Actor{
 	}
 	
 	public void setMaxValue(float max){
+		if(max > 1) max = 1;
+		if(max < 0) max = 0;
 		max_value = max;
 	}
 	
 	public void setMinValue(float min){
+		if(min > 1) min = 1;
+		if(min < 0) min = 0;
 		min_value = min;
 	}
 	
@@ -102,6 +107,8 @@ public class DragBar extends Actor{
 	public void reset(){
 		bx = x;
 		value = 0;
+		max_value = 1;
+		min_value = 0;
 		isDraged = false;
 		spritebutton.setPosition(bx, by);
 		batch.begin();

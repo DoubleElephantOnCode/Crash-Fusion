@@ -50,14 +50,24 @@ public class Play {
 		if(map.frontColumn < 0 || map.frontRow < 0 || 
 				map.realColumn < 0 || map.realRow < 0) return;
 		
-		if(dye[map.realRow][map.realRow].whose == 0 || 
-				dye[map.frontRow][map.frontColumn].whose == dye[map.realRow][map.realColumn].whose){
-			bar.setMaxValue(1.0f - ((float)dye[map.realRow][map.realRow].red + (float)dye[map.realRow][map.realRow].green + (float)dye[map.realRow][map.realRow].blue) / (float)dye[map.realRow][map.realRow].maxDye);
+		if(dye[map.realRow][map.realColumn].whose == 0 || dye[map.frontRow][map.frontColumn].whose == dye[map.realRow][map.realColumn].whose){
+			int t = dye[map.realRow][map.realColumn].maxDye - dye[map.realRow][map.realColumn].red - dye[map.realRow][map.realColumn].green - dye[map.realRow][map.realColumn].blue;
+			int m = dye[map.frontRow][map.frontColumn].red + dye[map.frontRow][map.frontColumn].green + dye[map.frontRow][map.frontColumn].blue;
+			if(m > 0)
+				bar.setMaxValue(((float) t)/(m));
+			else if(m == 0)
+				bar.setMaxValue(0);
 			mixFriend(value, isDown);
 		}
 		else if(dye[map.frontRow][map.frontColumn].whose > 0 && dye[map.realRow][map.realColumn].whose > 0 &&
 				dye[map.realRow][map.realColumn].whose != dye[map.frontRow][map.frontColumn].whose){
+			bar.setMaxValue(1);
 			mixEnemy(value, isDown);
+		}
+		else{
+			map.initialSelected();
+			Condition.condition = 0;
+			bar.reset();
 		}
 	}
 	
@@ -79,6 +89,10 @@ public class Play {
 			map.setColor(map.frontRow, map.frontColumn, d);
 		}
 		else{
+			tempRed = (int) (dye[map.frontRow][map.frontColumn].red * value);
+			tempGreen = (int) (dye[map.frontRow][map.frontColumn].green * value);
+			tempBlue = (int) (dye[map.frontRow][map.frontColumn].blue * value);
+			
 			dye[map.frontRow][map.frontColumn].red -= tempRed;
 			dye[map.frontRow][map.frontColumn].green -= tempGreen;
 			dye[map.frontRow][map.frontColumn].blue -= tempBlue;
@@ -91,7 +105,7 @@ public class Play {
 			if(dye[map.frontRow][map.frontColumn].red + dye[map.frontRow][map.frontColumn].green + dye[map.frontRow][map.frontColumn].blue == 0){
 				dye[map.frontRow][map.frontColumn].whose = 0;
 			}
-			
+			Condition.condition = 0;
 		}
 	}
 	
@@ -128,6 +142,13 @@ public class Play {
 			if(dye[map.frontRow][map.frontColumn].red + dye[map.frontRow][map.frontColumn].green + dye[map.frontRow][map.frontColumn].blue == 0){
 				dye[map.frontRow][map.frontColumn].whose = 0;
 			}
+			Condition.condition = 0;
 		}
 	}
+	
+//	private void resetTemp(){
+//		tempRed = 0;
+//		tempGreen = 0;
+//		tempBlue = 0;
+//	}
 }

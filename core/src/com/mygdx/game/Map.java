@@ -164,7 +164,9 @@ public class Map{
 	public void renderDye(){
 		for(int i = 0; i < numOfPoolRow; i++){
 			for(int j = 0; j < numOfPoolColumn; j++){
-				if(DragBar.isDraged && ((i == frontRow && j == frontColumn) || (i == realRow && j == realColumn))) continue;
+				if(Condition.condition == 3){
+					if(DragBar.isDraged && ((i == frontRow && j == frontColumn) || (i == realRow && j == realColumn))) continue;
+				}
 				Color color = MixColor.mixRGB(dye[i][j].red, dye[i][j].green, dye[i][j].blue);
 				setColor(i, j, color);
 			}
@@ -275,7 +277,7 @@ public class Map{
 		return -1;
 	}
 	
-	private void initialSelected(){
+	public void initialSelected(){
 		frontRow = -1;
 		frontColumn = -1;
 		realRow = -1;
