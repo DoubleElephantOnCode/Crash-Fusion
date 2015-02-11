@@ -34,8 +34,8 @@ public class MyGdxGame extends ApplicationAdapter {
 		Gdx.input.setInputProcessor(multiplexer);
 		
 		bar = new DragBar("green");
-		bar.setPosition(10, 10);
-		bar.setSize(400, 20);
+		bar.setPosition(50, 50);
+		bar.setSize(600, 50);
 		
 		play = new Play(map, bar);
 	}

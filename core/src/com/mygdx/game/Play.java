@@ -57,7 +57,6 @@ public class Play {
 				bar.setMaxValue(((float) t)/(m));
 			else if(m == 0)
 				bar.setMaxValue(0);
-			System.out.println(t + "  " +m);
 			mixFriend(value, isDown);
 		}
 		else if(dye[map.frontRow][map.frontColumn].whose > 0 && dye[map.realRow][map.realColumn].whose > 0 &&
