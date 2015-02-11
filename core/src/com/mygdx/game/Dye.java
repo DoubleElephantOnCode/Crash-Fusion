@@ -20,6 +20,17 @@ public class Dye {
 		bluecolor = new Blue(blue);
 	}
 	
+	public Dye(Dye d){
+		this.red =d.red;
+		this.green = d.green;
+		this.blue = d.blue;
+		redcolor = new Red(red);
+		greencolor = new Green(green);
+		bluecolor = new Blue(blue);
+		this.maxDye = d.maxDye;
+		this.whose = d.whose;
+	}
+	
 	
 	
 	public boolean isZero(){
@@ -42,5 +53,14 @@ public class Dye {
 		red = redcolor.num;
 		green = greencolor.num;
 		blue = bluecolor.num;
+	}
+	
+	/*
+	 * 将red green blue 和 redcolor greencolr bluecolor 里的数据e等 同步
+	 */
+	public void syncFromrToR(){
+		redcolor.num = red;
+		greencolor.num = green;
+		bluecolor.num = blue;
 	}
 }

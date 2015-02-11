@@ -5,6 +5,8 @@ import java.util.ArrayList;
 public class DyeCrash {
 	
 	public static Dye crash(Dye d1, Dye d2){
+		d1.syncFromrToR();
+		d2.syncFromrToR();
 		return firstcrash(d1,d2);
 	}
 	
@@ -25,9 +27,9 @@ public class DyeCrash {
 		d1.sync();
 		d2.sync();
 		if(d1.isZero()){
-			return d2;
+			return new Dye(d2);
 		}else{
-			return d1;
+			return new Dye(d1);
 		}
 	}
 }
