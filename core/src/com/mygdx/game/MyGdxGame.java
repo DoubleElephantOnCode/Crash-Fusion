@@ -49,6 +49,6 @@ public class MyGdxGame extends ApplicationAdapter {
 		
 		bar.render(pointer.getNowX(), pointer.getNowY(), Condition.useBar, pointer.DOWN);
 		
-		play.mixFriend(bar.value, pointer.DOWN);
+		play.move(bar.value, pointer.DOWN);
 	}
 }

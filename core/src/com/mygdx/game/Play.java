@@ -42,7 +42,26 @@ public class Play {
 		dye[maxRow-1][maxColumn-3].blue = 100; dye[maxRow-1][maxColumn-3].whose = 2;
 	}
 	
+	
+	
 	public void move(float value, boolean isDown){
+		if(value < 0.05) value = 0;
+		if(value > 0.95) value = 1;
+		if(map.frontColumn < 0 || map.frontRow < 0 || 
+				map.realColumn < 0 || map.realRow < 0) return;
+		
+		if(dye[map.realRow][map.realRow].whose == 0 || 
+				dye[map.frontRow][map.frontColumn].whose == dye[map.realRow][map.realColumn].whose){
+			bar.setMaxValue(1.0f - ((float)dye[map.realRow][map.realRow].red + (float)dye[map.realRow][map.realRow].green + (float)dye[map.realRow][map.realRow].blue) / (float)dye[map.realRow][map.realRow].maxDye);
+			mixFriend(value, isDown);
+		}
+		else if(dye[map.frontRow][map.frontColumn].whose > 0 && dye[map.realRow][map.realColumn].whose > 0 &&
+				dye[map.realRow][map.realColumn].whose != dye[map.frontRow][map.frontColumn].whose){
+			mixEnemy(value, isDown);
+		}
+	}
+	
+	public void mixEnemy(float value, boolean isDown){
 		if(value < 0.05) value = 0;
 		if(value > 0.95) value = 1;
 		if(map.frontColumn < 0 || map.frontRow < 0 || map.realColumn < 0 || map.realRow < 0) return;
@@ -65,8 +84,14 @@ public class Play {
 			dye[map.frontRow][map.frontColumn].blue -= tempBlue;
 			
 			Dye temp = new Dye(tempRed, tempGreen, tempBlue);
+			temp.whose = dye[map.frontRow][map.frontColumn].whose;
 			dye[map.realRow][map.realColumn] = DyeCrash.crash(temp, dye[map.realRow][map.realColumn]);
 			bar.reset();
+			
+			if(dye[map.frontRow][map.frontColumn].red + dye[map.frontRow][map.frontColumn].green + dye[map.frontRow][map.frontColumn].blue == 0){
+				dye[map.frontRow][map.frontColumn].whose = 0;
+			}
+			
 		}
 	}
 	
@@ -97,7 +122,12 @@ public class Play {
 			dye[map.realRow][map.realColumn].red += tempRed;
 			dye[map.realRow][map.realColumn].green += tempGreen;
 			dye[map.realRow][map.realColumn].blue += tempBlue;
+			dye[map.realRow][map.realColumn].whose = dye[map.frontRow][map.frontColumn].whose;
 			bar.reset();
+			
+			if(dye[map.frontRow][map.frontColumn].red + dye[map.frontRow][map.frontColumn].green + dye[map.frontRow][map.frontColumn].blue == 0){
+				dye[map.frontRow][map.frontColumn].whose = 0;
+			}
 		}
 	}
 }

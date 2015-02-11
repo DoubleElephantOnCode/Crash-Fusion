@@ -257,6 +257,7 @@ public class Map{
 			for(int j = 0; j < numOfPoolColumn; j++){
 				dye[i][j] = new Dye(0, 0, 0);
 				dye[i][j].whose = 0;
+				dye[i][j].maxDye = 100;
 			}
 		}
 	}
