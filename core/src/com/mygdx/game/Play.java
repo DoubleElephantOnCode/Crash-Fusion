@@ -57,6 +57,7 @@ public class Play {
 				bar.setMaxValue(((float) t)/(m));
 			else if(m == 0)
 				bar.setMaxValue(0);
+			System.out.println(t + "  " +m);
 			mixFriend(value, isDown);
 		}
 		else if(dye[map.frontRow][map.frontColumn].whose > 0 && dye[map.realRow][map.realColumn].whose > 0 &&
@@ -82,7 +83,9 @@ public class Play {
 			tempBlue = (int) (dye[map.frontRow][map.frontColumn].blue * value);
 			
 			Dye temp = new Dye(tempRed, tempGreen, tempBlue);
-			Dye realDye = DyeCrash.crash(temp, dye[map.realRow][map.realColumn]);
+			temp.whose = dye[map.frontRow][map.frontColumn].whose;
+			Dye realDye = new Dye(dye[map.realRow][map.realColumn]);
+			realDye = DyeCrash.crash(temp, realDye);
 			Color c = MixColor.mixRGB(realDye.red, realDye.green, realDye.blue);
 			map.setColor(map.realRow, map.realColumn, c);
 			Color d = MixColor.mixRGB(dye[map.frontRow][map.frontColumn].red - tempRed, dye[map.frontRow][map.frontColumn].green - tempGreen, dye[map.frontRow][map.frontColumn].blue - tempBlue);
@@ -99,6 +102,7 @@ public class Play {
 			
 			Dye temp = new Dye(tempRed, tempGreen, tempBlue);
 			temp.whose = dye[map.frontRow][map.frontColumn].whose;
+			temp.maxDye = dye[map.frontRow][map.frontColumn].maxDye;
 			dye[map.realRow][map.realColumn] = DyeCrash.crash(temp, dye[map.realRow][map.realColumn]);
 			bar.reset();
 			
@@ -106,6 +110,17 @@ public class Play {
 				dye[map.frontRow][map.frontColumn].whose = 0;
 			}
 			Condition.condition = 0;
+		}
+	}
+	
+	public void mixEnemyTotal(boolean isDown){
+		if(!isDown){
+			dye[map.realRow][map.realColumn] = DyeCrash.crash(dye[map.frontRow][map.frontColumn], dye[map.realRow][map.realColumn]);
+			dye[map.frontRow][map.frontColumn].red = 0;
+			dye[map.frontRow][map.frontColumn].green = 0;
+			dye[map.frontRow][map.frontColumn].blue = 0;
+			dye[map.frontRow][map.frontColumn].whose = 0;
+			bar.reset();
 		}
 	}
 	
