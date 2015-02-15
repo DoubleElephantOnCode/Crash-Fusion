@@ -16,6 +16,9 @@ public class MyGdxGame extends ApplicationAdapter {
 	Map map;
 	DragBar bar;
 	Play play;
+	DyeBar dyebar;
+	
+	int formerSR = -1, formerSC = -1;
 	
 //	int width = 800, height = 480;
 	String mapPath = "map/map.tmx";
@@ -37,6 +40,10 @@ public class MyGdxGame extends ApplicationAdapter {
 		bar.setPosition(50, 50);
 		bar.setSize(600, 50);
 		
+		dyebar = new DyeBar();
+		dyebar.setPosition(0, 0);
+		dyebar.setSize(500, 30);
+		
 		play = new Play(map, bar);
 	}
 
@@ -50,5 +57,16 @@ public class MyGdxGame extends ApplicationAdapter {
 		bar.render(pointer.getNowX(), pointer.getNowY(), Condition.useBar, pointer.DOWN);
 		
 		play.move(bar.value, pointer.DOWN);
+		
+		if(map.selectedRow != -1 && map.selectedColumn != -1){
+			if(formerSR != map.selectedRow || formerSC != map.selectedColumn){
+				formerSR = map.selectedRow;
+				formerSC = map.selectedColumn;
+				dyebar.render(map.dye[map.selectedRow][map.selectedColumn], true);
+			}
+			else{
+				dyebar.render(map.dye[map.selectedRow][map.selectedColumn], false);
+			}
+		}
 	}
 }
