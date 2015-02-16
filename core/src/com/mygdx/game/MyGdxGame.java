@@ -68,5 +68,9 @@ public class MyGdxGame extends ApplicationAdapter {
 				dyebar.render(map.dye[map.selectedRow][map.selectedColumn], false);
 			}
 		}
+		else{
+			formerSR = -1;
+			formerSC = -1;
+		}
 	}
 }

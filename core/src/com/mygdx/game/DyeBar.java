@@ -65,9 +65,9 @@ public class DyeBar {
 			stateTime = 0;
 			int total = dye.red + dye.green + dye.blue;
 			if(total == 0) return;
-			rW = dye.red / total * width;
-			gW = dye.green / total * width;
-			bW = dye.blue / total * width;
+			rW = dye.red * width / total;
+			gW = dye.green * width / total;
+			bW = dye.blue * width / total;
 		}
 		stateTime += Gdx.graphics.getDeltaTime();
 		cR = red.getKeyFrame(stateTime, false);
