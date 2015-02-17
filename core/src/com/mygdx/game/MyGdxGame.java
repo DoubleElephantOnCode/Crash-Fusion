@@ -16,6 +16,11 @@ public class MyGdxGame extends ApplicationAdapter {
 	Map map;
 	DragBar bar;
 	Play play;
+	DyeBar dyebar;
+	DyeBar dyebar_real;
+	
+	int formerSR = -1, formerSC = -1;
+	int formerRR = -1, formerRC = -1;
 	
 //	int width = 800, height = 480;
 	String mapPath = "map/map.tmx";
@@ -37,6 +42,14 @@ public class MyGdxGame extends ApplicationAdapter {
 		bar.setPosition(50, 50);
 		bar.setSize(600, 50);
 		
+		dyebar = new DyeBar();
+		dyebar.setPosition(0, 0);
+		dyebar.setSize(500, 45);
+		
+		dyebar_real = new DyeBar();
+		dyebar_real.setPosition(510, 0);
+		dyebar_real.setSize(500, 45);
+		
 		play = new Play(map, bar);
 	}
 
@@ -50,5 +63,53 @@ public class MyGdxGame extends ApplicationAdapter {
 		bar.render(pointer.getNowX(), pointer.getNowY(), Condition.useBar, pointer.DOWN);
 		
 		play.move(bar.value, pointer.DOWN);
+		
+		if(map.selectedRow != -1 && map.selectedColumn != -1){
+			if(formerSR != map.selectedRow || formerSC != map.selectedColumn){
+				formerSR = map.selectedRow;
+				formerSC = map.selectedColumn;
+				dyebar.render(map.dye[map.selectedRow][map.selectedColumn], true);
+			}
+			else{
+				dyebar.render(map.dye[map.selectedRow][map.selectedColumn], false);
+			}
+		}
+		else{
+//			formerSR = -1;
+//			formerSC = -1;
+			
+			if(map.frontRow != -1 && map.frontColumn != -1){
+				if(formerSR != map.frontRow || formerSC != map.frontColumn){
+					formerSR = map.frontRow;
+					formerSC = map.frontColumn;
+					dyebar.render(map.dye[map.frontRow][map.frontColumn], true);
+				}
+				else{
+					dyebar.render(map.dye[map.frontRow][map.frontColumn], false);
+				}
+			}
+			else{
+				formerSR = -1;
+				formerSC = -1;
+			}
+			
+		}
+		
+		
+		
+		if(map.realRow != -1 && map.realColumn != -1){
+			if(formerRR != map.realRow || formerRC != map.realColumn){
+				formerRR = map.realRow;
+				formerRC = map.realColumn;
+				dyebar_real.render(map.dye[map.realRow][map.realColumn], true);
+			}
+			else{
+				dyebar_real.render(map.dye[map.realRow][map.realColumn], false);
+			}
+		}
+		else{
+			formerRR = -1;
+			formerRC = -1;
+		}
 	}
 }
