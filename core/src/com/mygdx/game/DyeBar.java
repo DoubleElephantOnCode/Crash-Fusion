@@ -1,6 +1,7 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -73,6 +74,8 @@ public class DyeBar {
 		cR = red.getKeyFrame(stateTime, false);
 		cG = green.getKeyFrame(stateTime, false);
 		cB = blue.getKeyFrame(stateTime, false);
+		Color tint = new Color(1, 1, 1, (float)(dye.red + dye.green + dye.blue) / dye.maxDye);
+		batch.setColor(tint);
 		batch.begin();
 		batch.draw(cB, x, y, bW * cB.getRegionWidth() / b.getWidth(), height);
 		batch.draw(cG, x, y+height, gW * cG.getRegionWidth() / g.getWidth(), height);
