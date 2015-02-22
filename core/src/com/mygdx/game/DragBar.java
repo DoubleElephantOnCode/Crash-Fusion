@@ -1,7 +1,9 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -13,6 +15,7 @@ public class DragBar extends Actor{
 	Sprite spritebutton;
 	Sprite spritebar;
 	SpriteBatch batch;
+	BitmapFont percentage;
 	
 	int width = 0, height = 0;
 	float x = 0, y = 0;
@@ -20,7 +23,9 @@ public class DragBar extends Actor{
 	float value = 0;
 	float max_value = 1;
 	float min_value = 0;
+	
 	static boolean isDraged = false;
+	static Color percentageNumColor = new Color(1, 1, 1, 0.6f);
 	public DragBar(String color){
 		Texture buttonImg = new Texture(Gdx.files.internal("dragBar/dragButton_"+color+".png"));
 		Texture barImg = new Texture(Gdx.files.internal("dragBar/bar.png"));
@@ -29,6 +34,10 @@ public class DragBar extends Actor{
 		spritebutton = new Sprite(buttonImg);
 		spritebar = new Sprite(barImg);
 		batch = new SpriteBatch();
+		
+		percentage = new BitmapFont(Gdx.files.internal("percentageNum/number.fnt"), Gdx.files.internal("percentageNum/number.png"), false);
+		percentage.setColor(percentageNumColor);
+		percentage.setScale(1);
 	}
 	
 	public void render(float x, float y, boolean useable, boolean isDown){
@@ -46,8 +55,16 @@ public class DragBar extends Actor{
 				bx = this.x + value * width;
 			}
 			spritebutton.setPosition(bx, by);
+			
 			isDraged = true;
 			Condition.condition = 3;
+			
+			
+			int v = (int) (value * 100);
+			
+			batch.begin();
+			percentage.draw(batch, v + "%", x, this.y + height * 2);
+			batch.end();
 		}
 		batch.begin();
 		spritebar.draw(batch);
