@@ -1,24 +1,26 @@
 package com.mygdx.game;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 
 /**
  * 
  * @author HalaWKS
  * 混色界面
  */
-public class ColorMixInterface {
-	
+public class ColorMixInterface extends Stage {
 
 	// 图片的RGB值
 	float r;
@@ -26,18 +28,26 @@ public class ColorMixInterface {
 	float b;
 
 	// 间距
-	int PADDING = 20;
-	int PADDING_Y = 85;
+	int PADDING = 200;
+	int PADDING_Y = 100;
 
 	//判断添加了多少种颜色
 	int colorNum;
+	//判断是否完成颜色配置
+	boolean isFinished = false;
 	
 	Image redBucket;
 	Image greenBucket;
 	Image blueBucket;
 	ImageButton confirmBtn;
 	ImageButton deleteBtn;
+	ImageButton nextBtn;
 //	ImageButton colorSquare[];
+	
+	/**
+	 * 颜色们
+	 */
+	static Color colors[];
 	
 	static Texture texPic;
 	static Texture colorArea[];
@@ -52,6 +62,8 @@ public class ColorMixInterface {
 	static DragBar blue;
 
 	public ColorMixInterface() {
+		super(new StretchViewport(1920, 1080));
+		
 		r = 1f;
 		g = 1f;
 		b = 1f;
@@ -63,27 +75,27 @@ public class ColorMixInterface {
 		this.mixedColorArea();
 		
 		red = new DragBar("red");
-		red.setPosition(100, 220);
-		red.setSize(200, 20);
+		red.setPosition(300, 400);
+		red.setSize(1000, 100);
 		
 		green = new DragBar("green");
-		green.setPosition(100, 140);
-		green.setSize(200, 20);
+		green.setPosition(300, 300);
+		green.setSize(1000, 100);
 		
 		blue = new DragBar("blue");
-		blue.setPosition(100, 60);
-		blue.setSize(200, 20);
+		blue.setPosition(300, 200);
+		blue.setSize(1000, 100);
 	}
 
 	public void createPic() {
-		texPic = new Texture(Gdx.files.internal("white.png"));
+		texPic = new Texture(Gdx.files.internal("colorMix/white.png"));
 		sprite = new Sprite(texPic);
 		sprite.setColor(1, 1, 1, 1);
-		sprite.setPosition(200, 300);
+		sprite.setPosition(600, 600);
 	}
 
 	public void createBuckets() {
-		Texture tex = new Texture(Gdx.files.internal("buckets_s.png"));
+		Texture tex = new Texture(Gdx.files.internal("colorMix/buckets_s.png"));
 		TextureRegion[][] texRegs = TextureRegion.split(tex, 60, 85);
 
 		redBucket = new Image(texRegs[0][1]);
@@ -95,22 +107,31 @@ public class ColorMixInterface {
 		redBucket.setPosition(greenBucket.getX(), greenBucket.getY() + PADDING_Y);
 	}
 
+	/**
+	 * 创建按钮
+	 */
 	public void createButton(){
 		TextureRegionDrawable btnConfirm = new TextureRegionDrawable(
-				new TextureRegion(new Texture(Gdx.files.internal("confirm_s.png"))));
+				new TextureRegion(new Texture(Gdx.files.internal("colorMix/confirm_s.png"))));
 		TextureRegionDrawable btnConfirmPush = new TextureRegionDrawable(new TextureRegion(
-				new Texture(Gdx.files.internal("confirm_s_push.png"))));
+				new Texture(Gdx.files.internal("colorMix/confirm_s_push.png"))));
 		TextureRegionDrawable btnDelete = new TextureRegionDrawable(
-				new TextureRegion(new Texture(Gdx.files.internal("delete_s.jpg"))));
+				new TextureRegion(new Texture(Gdx.files.internal("colorMix/delete_s.jpg"))));
 		TextureRegionDrawable btnDeletePush = new TextureRegionDrawable(
-				new TextureRegion(new Texture(Gdx.files.internal("delete_s_push.jpg"))));
+				new TextureRegion(new Texture(Gdx.files.internal("colorMix/delete_s_push.jpg"))));
+		TextureRegionDrawable btnRight = new TextureRegionDrawable(
+				new TextureRegion(new Texture(Gdx.files.internal("colorMix/arrow_right.png"))));
+		TextureRegionDrawable btnRightPush = new TextureRegionDrawable(
+				new TextureRegion(new Texture(Gdx.files.internal("colorMix/arrow_right_push.png"))));
 		
 		confirmBtn = new ImageButton(btnConfirm, btnConfirmPush);
 		deleteBtn = new ImageButton(btnDelete, btnDeletePush);
+		nextBtn = new ImageButton(btnRight, btnRightPush);
 		
 		//设定按钮坐标
-		confirmBtn.setPosition(350, PADDING);
-		deleteBtn.setPosition(confirmBtn.getX() + confirmBtn.getWidth() + PADDING, PADDING);
+		confirmBtn.setPosition(700, PADDING / 2);
+		deleteBtn.setPosition(confirmBtn.getX() + confirmBtn.getWidth() + PADDING, confirmBtn.getY());
+		nextBtn.setPosition(deleteBtn.getX() + deleteBtn.getWidth() + PADDING, deleteBtn.getY());
 		
 		confirmBtn.addListener(new InputListener(){
 			@Override
@@ -153,6 +174,22 @@ public class ColorMixInterface {
 			}
 		});
 		
+		nextBtn.addListener(new InputListener(){
+			@Override
+			public void touchUp(InputEvent event, float x, float y,
+					int pointer, int button) {
+				super.touchUp(event, x, y, pointer, button);
+			}
+
+			@Override
+			public boolean touchDown(InputEvent event, float x, float y,
+					int pointer, int button) {
+				//TODO 完成颜色配置
+				isFinished = true;
+				System.out.println(isFinished);
+				return true;
+			}
+		});
 		
 	}
 
@@ -163,10 +200,10 @@ public class ColorMixInterface {
 		colorArea = new Texture[3];
 		spriteForColorSqr = new Sprite[3];
 		for (int i = 0; i < colorArea.length; i++) {
-			colorArea[i] = new Texture(Gdx.files.internal("colorSquare.png"));
+			colorArea[i] = new Texture(Gdx.files.internal("colorMix/colorSquare.png"));
 			spriteForColorSqr[i] = new Sprite(colorArea[i]);
 			spriteForColorSqr[i].setColor(1, 1, 1, 1);
-			spriteForColorSqr[i].setPosition(500, 300 - i * PADDING_Y);
+			spriteForColorSqr[i].setPosition(1400, 700 - i * PADDING_Y);
 		}
 		
 	}
@@ -183,12 +220,23 @@ public class ColorMixInterface {
 				if((x >= s.getX()) && (x <= s.getX() + s.getWidth()) &&
 						(y >= s.getY()) && (y <= s.getY() + s.getHeight())){
 					Color c = s.getColor();
-					red.spritebutton.setPosition(c.r * 200 + red.getX(), red.getY());
-					green.spritebutton.setPosition(c.g * 200 + green.getWidth(), green.getY());
-					blue.spritebutton.setPosition(c.b * 200 + blue.getWidth(), blue.getY());
+					red.spritebutton.setPosition(c.r * red.getWidth() + red.getX(), red.getY());
+					green.spritebutton.setPosition(c.g * green.getWidth() + green.getX(), green.getY());
+					blue.spritebutton.setPosition(c.b * green.getWidth() + blue.getX(), blue.getY());
 				}
 			}
 		}
 	}
 	
+	/**
+	 * 获取设定的颜色
+	 * @return
+	 */
+	public static Color[] getColors(){
+		colors = new Color[colorArea.length];
+		for (int i = 0; i < colors.length; i++) {
+			colors[i] = spriteForColorSqr[i].getColor();
+		}
+		return colors;
+	}
 }

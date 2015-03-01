@@ -40,6 +40,31 @@ public class DragBar extends Actor{
 		percentage.setScale(1);
 	}
 	
+	/**
+	 * render for ColorMixInterface
+	 * @param x
+	 * @param y
+	 * @param isDown
+	 */
+	public void render(float x, float y, boolean isDown){
+		if(isDown && (x - this.x) >= height / 2 && (x - this.x) <= width &&
+				(y - this.y) >= 0 && (y - this.y) <= height){
+			bx = x - height / 2;
+			if(bx < this.x){ 
+				bx = x;
+			}
+			value = (bx - this.x) / width;
+			spritebutton.setPosition(bx, by);
+			isDraged = true;
+		}
+		batch.begin();
+		spritebar.draw(batch);
+		batch.end();
+		batch.begin();
+		spritebutton.draw(batch);
+		batch.end();
+	}
+	
 	public void render(float x, float y, boolean useable, boolean isDown){
 		if(isDown && useable && (x - this.x) >= -height / 2 && (x - this.x) <= width + height / 2 && (y - this.y) >= -height / 2 && (y - this.y) <= height * 3 / 2){
 			bx = x;
@@ -134,6 +159,18 @@ public class DragBar extends Actor{
 		batch.begin();
 		spritebutton.draw(batch);
 		batch.end();
+	}
+	
+	public float getX(){
+		return x;
+	}
+	
+	public float getY(){
+		return y;
+	}
+	
+	public float getWidth(){
+		return width;
 	}
 	
 }
