@@ -21,4 +21,12 @@ public class Colour {
 	public void crash(Colour another){
 		
 	}
+	
+	/**
+	 *  两种颜色抵消的方法    红克绿  绿克蓝 蓝克红  暂定相克颜色抵消比例为1：2
+	 * @param another
+	 */
+	public void crash2(Colour another){
+		
+	}
 }

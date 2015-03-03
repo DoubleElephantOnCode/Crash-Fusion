@@ -55,4 +55,33 @@ public class Red extends Colour{
 		}
 		
 	}
+	
+	public void crash2(Colour another){
+		if(another.type == Type.red){
+			if(num >= another.num){
+				num -= another.num;
+				another.num = 0;
+			}else{
+				another.num -= num;
+				num = 0;
+			}
+		}else if(another.type == Type.green){
+			if(2*num >= another.num){
+				num -= another.num/2;
+				another.num = 0;
+			}else{
+				another.num -= 2*num;
+				num = 0;
+			}
+		}else if(another.type == Type.blue){
+			if(num >= 2*another.num){
+				num -= 2*another.num;
+				another.num = 0;
+			}else{
+				another.num -= num/2;
+				num = 0;
+			}
+		}
+		
+	}
 }
