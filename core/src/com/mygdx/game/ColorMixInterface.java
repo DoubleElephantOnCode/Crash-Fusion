@@ -50,11 +50,11 @@ public class ColorMixInterface extends Stage {
 	static Color colors[];
 	
 	static Texture texPic;
-	static Texture colorArea[];
+	static ColorArea colorArea[];
 	
 	static SpriteBatch batch;
 	static Sprite sprite;
-	static Sprite spriteForColorSqr[];
+//	static Sprite spriteForColorSqr[];
 	
 	
 	static DragBar red;
@@ -145,7 +145,9 @@ public class ColorMixInterface extends Stage {
 					int pointer, int button) {
 				//TODO 添加一种颜色
 				if(colorNum < colorArea.length){
-					spriteForColorSqr[colorNum].setColor(sprite.getColor());
+					ColorForMix cfm = new ColorForMix(red.value, green.value, blue.value);
+					colorArea[colorNum].sprite.setColor(cfm.getColor());
+					colorArea[colorNum].setColorForMix(cfm);
 					colorNum++;
 					System.out.println("add a color");
 				}
@@ -165,7 +167,7 @@ public class ColorMixInterface extends Stage {
 					int pointer, int button) {
 				//TODO 删除一种颜色
 				if((colorNum <= colorArea.length) && (colorNum > 0)){
-					spriteForColorSqr[colorNum - 1].setColor(new Color(1, 1, 1, 1));
+					colorArea[colorNum - 1].sprite.setColor(new Color(1, 1, 1, 1));
 					colorNum--;
 					System.out.println("delete a color");
 				}
@@ -197,13 +199,17 @@ public class ColorMixInterface extends Stage {
 	 * 添加的颜色显示区域
 	 */
 	public void mixedColorArea(){
-		colorArea = new Texture[3];
-		spriteForColorSqr = new Sprite[3];
+		colorArea = new ColorArea[3];
+//		spriteForColorSqr = new Sprite[3];
 		for (int i = 0; i < colorArea.length; i++) {
-			colorArea[i] = new Texture(Gdx.files.internal("colorMix/colorSquare.png"));
-			spriteForColorSqr[i] = new Sprite(colorArea[i]);
-			spriteForColorSqr[i].setColor(1, 1, 1, 1);
-			spriteForColorSqr[i].setPosition(1400, 700 - i * PADDING_Y);
+//			colorArea[i] = new Texture(Gdx.files.internal("colorMix/colorSquare.png"));
+//			spriteForColorSqr[i] = new Sprite(colorArea[i]);
+//			spriteForColorSqr[i] = new Sprite(colorArea[i].getTexture());
+//			spriteForColorSqr[i].setColor(1, 1, 1, 1);
+//			spriteForColorSqr[i].setPosition(1400, 700 - i * PADDING_Y);
+			colorArea[i] = new ColorArea(new Texture(Gdx.files.internal("colorMix/colorSquare.png")));
+			colorArea[i].sprite.setColor(1, 1, 1, 1);
+			colorArea[i].sprite.setPosition(1400, 700 - i * PADDING_Y);
 		}
 		
 	}
@@ -216,13 +222,15 @@ public class ColorMixInterface extends Stage {
 	 */
 	public static void rgbDisplay(float x, float y, boolean isTouched){
 		if(isTouched){
-			for (Sprite s : spriteForColorSqr) {
-				if((x >= s.getX()) && (x <= s.getX() + s.getWidth()) &&
-						(y >= s.getY()) && (y <= s.getY() + s.getHeight())){
-					Color c = s.getColor();
-					red.spritebutton.setPosition(c.r * red.getWidth() + red.getX(), red.getY());
-					green.spritebutton.setPosition(c.g * green.getWidth() + green.getX(), green.getY());
-					blue.spritebutton.setPosition(c.b * green.getWidth() + blue.getX(), blue.getY());
+			for (ColorArea c : colorArea) {
+				if((x >= c.sprite.getX()) && (x <= c.sprite.getX() + c.sprite.getWidth()) &&
+						(y >= c.sprite.getY()) && (y <= c.sprite.getY() + c.sprite.getHeight())){
+					red.spritebutton.setPosition(c.getColorForMix().getR() * red.getWidth()
+							+ red.getX(), red.getY());
+					green.spritebutton.setPosition(c.getColorForMix().getG() * green.getWidth()
+							+ green.getX(), green.getY());
+					blue.spritebutton.setPosition(c.getColorForMix().getB() * green.getWidth()
+							+ blue.getX(), blue.getY());
 				}
 			}
 		}
@@ -235,7 +243,7 @@ public class ColorMixInterface extends Stage {
 	public static Color[] getColors(){
 		colors = new Color[colorArea.length];
 		for (int i = 0; i < colors.length; i++) {
-			colors[i] = spriteForColorSqr[i].getColor();
+			colors[i] = colorArea[i].getColorForMix().getColor();
 		}
 		return colors;
 	}
